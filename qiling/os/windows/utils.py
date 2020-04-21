@@ -5,6 +5,7 @@
 import struct
 from unicorn.x86_const import *
 import string as st
+import uuid
 
 from qiling.const import *
 from qiling.os.const import *
@@ -59,6 +60,10 @@ def ql_x86_windows_hook_mem_error(self, addr, size, value):
 def string_unpack(string):
     return string.decode().split("\x00")[0]
 
+def read_guid(ql, address):
+    result = ""
+    raw_guid = ql.mem.read(address, 16)
+    return uuid.UUID(bytes_le=bytes(raw_guid))
 
 def read_wstring(ql, address):
     result = ""
