@@ -172,6 +172,7 @@ if __name__ == '__main__':
 
     run_parser = commands.add_parser('run', help = 'run')
     run_parser.add_argument('-f', '--filename', required=False, default='', metavar="FILE", dest="filename", help="filename")
+    run_parser.add_argument('--env', required=False, default='', metavar="FILE", dest="env_filename", help="Pickle file containing an environment dictionary")
     run_parser.add_argument('--rootfs', required=True, help='emulated rootfs')
     run_parser.add_argument('-o', '--output', required=False, default='default',
                             help='output mode, options are off, debug , disasm, dump')
@@ -254,6 +255,11 @@ if __name__ == '__main__':
             print("ERROR: Command error!")
             usage()
             exit(1)
+        
+        if options.env_filename != '':
+            import pickle
+            with open(options.env_filename, 'rb') as f:
+                ql.env = pickle.load(f)
 
         if options.gdb:
             ql.debugger = options.gdb
