@@ -266,14 +266,14 @@ class GDBSERVERsession(object):
                 try:
                     if self.ql.archtype== QL_X86:
                         if reg_index <= 24:
-                            reg_value = self.ql.register(registers_x86[reg_index-1])
+                            reg_value = self.ql.register(self.ql.arch.get_reg_table()[reg_index-1])
                         else:
                             reg_value = 0
                         reg_value = self.ql.addr_to_str(reg_value)
                     
                     if self.ql.archtype== QL_X8664:
                         if reg_index <= 32:
-                            reg_value = self.ql.register(registers_x8664[reg_index-1])
+                            reg_value = self.ql.register(self.ql.arch.get_reg_table()[reg_index-1])
                         else:
                             reg_value = 0
                         if reg_index <= 17:
