@@ -43,7 +43,7 @@ def ql_ostype_convert_str(ostype):
         QL_MACOS: "macos",
         QL_FREEBSD: "freebsd",
         QL_WINDOWS: "windows",
-        QL_EFI: "efi",
+        QL_UEFI: "uefi",
     }
 
     return adapter.get(ostype)
@@ -55,7 +55,7 @@ def ostype_convert(ostype):
         "macos": QL_MACOS,
         "freebsd": QL_FREEBSD,
         "windows": QL_WINDOWS,
-        "efi": QL_EFI,
+        "uefi": QL_UEFI,
     }
     if ostype in adapter:
         return adapter[ostype]
@@ -237,7 +237,7 @@ def ql_pe_check_archtype(path):
     if arch:
         if pe.OPTIONAL_HEADER.Subsystem >= pefile.SUBSYSTEM_TYPE['IMAGE_SUBSYSTEM_EFI_APPLICATION'] and \
         pe.OPTIONAL_HEADER.Subsystem <= pefile.SUBSYSTEM_TYPE['IMAGE_SUBSYSTEM_EFI_ROM'] :
-            ostype = QL_EFI
+            ostype = QL_UEFI
         else:
             ostype = QL_WINDOWS
     else:
