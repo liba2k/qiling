@@ -308,7 +308,6 @@ if __name__ == '__main__':
         import pickle
         with open(options.env, 'rb') as f:
             ql.env = pickle.load(f, encoding='bytes')
-            print(ql.env)
     
     timeout = 0
     if options.timeout != None:

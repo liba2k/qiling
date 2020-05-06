@@ -28,16 +28,17 @@ class QlLoaderPE_UEFI(QlLoader):
     def __init__(self, ql):
         super()
         self.ql = ql
-    
-    def run(self):
-        self.profile = self.ql.profile
-        self.tpl = 4 # TPL_APPLICATION
         self.hook_override = {}
         self.modules = []
         self.events = {}
         self.handle_dict = {}
         self.notify_list = []
         self.notify_immediately = False
+        
+    
+    def run(self):
+        self.profile = self.ql.profile
+        self.tpl = 4 # TPL_APPLICATION
         if self.ql.archtype == QL_ARCH.X8664:
             self.heap_base_address = int(self.profile.get("OS64", "heap_address"),16)
             self.heap_base_size = int(self.profile.get("OS64", "heap_size"),16)       
