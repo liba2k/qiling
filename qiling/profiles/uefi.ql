@@ -47,6 +47,12 @@ guid = c2702b74-800c-4131-8746-8fb5b89ce4ac
 [EFI_SMM_SW_DISPATCH2_PROTOCOL]
 guid = 18a3c6dc-5eea-48c8-a1c1-b53389f98999
 
+[EFI_SMM_CPU_PROTOCOL]
+guid = eb346b97-975f-4a9f-8b22-f8e92bb3d569
+
+[SMM]
+smbase = 0x12000
+smram_size = 0xff00
 
 [LOG]
 # log directory output

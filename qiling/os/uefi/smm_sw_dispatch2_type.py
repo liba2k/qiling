@@ -64,6 +64,9 @@ class struct__EFI_SMM_SW_DISPATCH2_PROTOCOL(ctypes.Structure):
 class struct_EFI_SMM_SW_REGISTER_CONTEXT(ctypes.Structure):
     pass
 
+class struct_EFI_SMM_CPU_PROTOCOL(ctypes.Structure):
+    pass
+
 struct__EFI_SMM_SW_DISPATCH2_PROTOCOL._pack_ = True # source:False
 struct__EFI_SMM_SW_DISPATCH2_PROTOCOL._functions_ = []
 struct__EFI_SMM_SW_DISPATCH2_PROTOCOL._fields_ = [
@@ -94,15 +97,35 @@ EFI_SMM_SW_REGISTER_CONTEXT = struct_EFI_SMM_SW_REGISTER_CONTEXT
 PEFI_SMM_SW_REGISTER_CONTEXT = POINTER_T(struct_EFI_SMM_SW_REGISTER_CONTEXT)
 EFI_SMM_SW_REGISTER2 = POINTER_T(ctypes.CFUNCTYPE(ctypes.c_uint64, POINTER_T(struct__EFI_SMM_SW_DISPATCH2_PROTOCOL), POINTER_T(ctypes.CFUNCTYPE(ctypes.c_uint64, POINTER_T(None), POINTER_T(None), POINTER_T(None), POINTER_T(ctypes.c_uint64))), POINTER_T(struct_EFI_SMM_SW_REGISTER_CONTEXT), POINTER_T(POINTER_T(None))))
 EFI_SMM_SW_UNREGISTER2 = POINTER_T(ctypes.CFUNCTYPE(ctypes.c_uint64, POINTER_T(struct__EFI_SMM_SW_DISPATCH2_PROTOCOL), POINTER_T(None)))
+
+EFI_SMM_CPU_READ_SAVE_STATE = POINTER_T(ctypes.CFUNCTYPE(ctypes.c_uint64, POINTER_T(struct_EFI_SMM_CPU_PROTOCOL), POINTER_T(None), POINTER_T(None), POINTER_T(None), POINTER_T(None)))
+EFI_SMM_CPU_WRITE_SAVE_STATE = POINTER_T(ctypes.CFUNCTYPE(ctypes.c_uint64, POINTER_T(struct_EFI_SMM_CPU_PROTOCOL), UINTN, UINTN, UINTN, POINTER_T(None)))
+
+struct_EFI_SMM_CPU_PROTOCOL._pack_ = True # source:False
+struct_EFI_SMM_CPU_PROTOCOL._functions_ = []
+struct_EFI_SMM_CPU_PROTOCOL._functions_.append(("ReadSaveState",['ctypes.c_uint64', 'POINTER_T(struct__EFI_SMM_SW_DISPATCH2_PROTOCOL)', 'POINTER_T(ctypes.CFUNCTYPE(ctypes.c_uint64, POINTER_T(None), POINTER_T(None), POINTER_T(None), POINTER_T(ctypes.c_uint64)))', 'POINTER_T(struct_EFI_SMM_SW_REGISTER_CONTEXT)', 'POINTER_T(POINTER_T(None))']))
+struct_EFI_SMM_CPU_PROTOCOL._functions_.append(("WriteSaveState",['ctypes.c_uint64', 'POINTER_T(struct__EFI_SMM_SW_DISPATCH2_PROTOCOL)', 'POINTER_T(ctypes.CFUNCTYPE(ctypes.c_uint64, POINTER_T(None), POINTER_T(None), POINTER_T(None), POINTER_T(ctypes.c_uint64)))', 'POINTER_T(struct_EFI_SMM_SW_REGISTER_CONTEXT)', 'POINTER_T(POINTER_T(None))']))
+struct_EFI_SMM_CPU_PROTOCOL._fields_ = [
+    ('ReadSaveState', EFI_SMM_CPU_READ_SAVE_STATE),
+    ('WriteSaveState', EFI_SMM_CPU_WRITE_SAVE_STATE),
+]
+
+_EFI_SMM_CPU_PROTOCOL = struct_EFI_SMM_CPU_PROTOCOL
+EFI_SMM_CPU_PROTOCOL = struct_EFI_SMM_CPU_PROTOCOL
+P_EFI_SMM_CPU_PROTOCOL = POINTER_T(struct_EFI_SMM_CPU_PROTOCOL)
+
 __all__ = \
     ['EFI_HANDLE', 'EFI_MM_HANDLER_ENTRY_POINT',
     'EFI_SMM_HANDLER_ENTRY_POINT2', 'EFI_SMM_SW_DISPATCH2_PROTOCOL',
     'EFI_SMM_SW_REGISTER2', 'EFI_SMM_SW_REGISTER_CONTEXT',
     'EFI_SMM_SW_UNREGISTER2', 'EFI_STATUS', 'ImageBaseOffset32',
     'PEFI_SMM_SW_REGISTER_CONTEXT', 'P_EFI_SMM_SW_DISPATCH2_PROTOCOL',
+    '_EFI_SMM_CPU_PROTOCOL', 'EFI_SMM_CPU_PROTOCOL', 'P_EFI_SMM_CPU_PROTOCOL',
     'RETURN_STATUS', 'UINT64', 'UINTN',
     '_EFI_SMM_SW_DISPATCH2_PROTOCOL', 'byte', 'dword', 'longlong',
     'qword', 'struct_EFI_SMM_SW_REGISTER_CONTEXT',
     'struct__EFI_SMM_SW_DISPATCH2_PROTOCOL', 'uchar', 'uint',
     'ulonglong', 'undefined', 'undefined1', 'undefined2',
     'undefined4', 'undefined8', 'ushort', 'word']
+
+
