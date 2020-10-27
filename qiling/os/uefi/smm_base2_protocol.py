@@ -11,7 +11,7 @@ from .fncc import *
     "InSmram": POINTER, #POINTER_T(ctypes.c_ubyte)
 })
 def hook_InSmm(ql, address, params):
-    write_int64(ql, params["InSmram"], 0)
+    write_int64(ql, params["InSmram"], 1)
     return EFI_SUCCESS
 
 @dxeapi(params={
