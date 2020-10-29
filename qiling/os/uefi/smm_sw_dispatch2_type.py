@@ -7,6 +7,8 @@
 #
 import ctypes
 
+from qiling.os.uefi.type64 import EFI_GET_VARIABLE, EFI_SET_VARIABLE, EFI_GET_NEXT_VARIABLE_NAME, \
+    EFI_QUERY_VARIABLE_INFO
 
 c_int128 = ctypes.c_ubyte*16
 c_uint128 = c_int128
@@ -67,6 +69,9 @@ class struct_EFI_SMM_SW_REGISTER_CONTEXT(ctypes.Structure):
 class struct_EFI_SMM_CPU_PROTOCOL(ctypes.Structure):
     pass
 
+class struct_EFI_SMM_VARIABLE_PROTOCOL(ctypes.Structure):
+    pass
+
 struct__EFI_SMM_SW_DISPATCH2_PROTOCOL._pack_ = True # source:False
 struct__EFI_SMM_SW_DISPATCH2_PROTOCOL._functions_ = []
 struct__EFI_SMM_SW_DISPATCH2_PROTOCOL._fields_ = [
@@ -114,6 +119,21 @@ _EFI_SMM_CPU_PROTOCOL = struct_EFI_SMM_CPU_PROTOCOL
 EFI_SMM_CPU_PROTOCOL = struct_EFI_SMM_CPU_PROTOCOL
 P_EFI_SMM_CPU_PROTOCOL = POINTER_T(struct_EFI_SMM_CPU_PROTOCOL)
 
+struct_EFI_SMM_VARIABLE_PROTOCOL._pack_ = True # source:False
+struct_EFI_SMM_VARIABLE_PROTOCOL._functions_ = []
+#struct_EFI_SMM_VARIABLE_PROTOCOL._functions_.append(("ReadSaveState",['ctypes.c_uint64', 'POINTER_T(struct__EFI_SMM_SW_DISPATCH2_PROTOCOL)', 'POINTER_T(ctypes.CFUNCTYPE(ctypes.c_uint64, POINTER_T(None), POINTER_T(None), POINTER_T(None), POINTER_T(ctypes.c_uint64)))', 'POINTER_T(struct_EFI_SMM_SW_REGISTER_CONTEXT)', 'POINTER_T(POINTER_T(None))']))
+#struct_EFI_SMM_VARIABLE_PROTOCOL._functions_.append(("WriteSaveState",['ctypes.c_uint64', 'POINTER_T(struct__EFI_SMM_SW_DISPATCH2_PROTOCOL)', 'POINTER_T(ctypes.CFUNCTYPE(ctypes.c_uint64, POINTER_T(None), POINTER_T(None), POINTER_T(None), POINTER_T(ctypes.c_uint64)))', 'POINTER_T(struct_EFI_SMM_SW_REGISTER_CONTEXT)', 'POINTER_T(POINTER_T(None))']))
+struct_EFI_SMM_VARIABLE_PROTOCOL._fields_ = [
+    ('SmmGetVariable', EFI_GET_VARIABLE),
+    ('SmmGetNextVariableName', EFI_GET_NEXT_VARIABLE_NAME),
+    ('SmmSetVariable', EFI_SET_VARIABLE),
+    ('SmmQueryVariableInfo', EFI_QUERY_VARIABLE_INFO),
+]
+
+_EFI_SMM_VARIABLE_PROTOCOL = struct_EFI_SMM_VARIABLE_PROTOCOL
+EFI_SMM_VARIABLE_PROTOCOL = struct_EFI_SMM_VARIABLE_PROTOCOL
+P_EFI_SMM_VARIABLE_PROTOCOL = POINTER_T(struct_EFI_SMM_VARIABLE_PROTOCOL)
+
 __all__ = \
     ['EFI_HANDLE', 'EFI_MM_HANDLER_ENTRY_POINT',
     'EFI_SMM_HANDLER_ENTRY_POINT2', 'EFI_SMM_SW_DISPATCH2_PROTOCOL',
@@ -121,6 +141,7 @@ __all__ = \
     'EFI_SMM_SW_UNREGISTER2', 'EFI_STATUS', 'ImageBaseOffset32',
     'PEFI_SMM_SW_REGISTER_CONTEXT', 'P_EFI_SMM_SW_DISPATCH2_PROTOCOL',
     '_EFI_SMM_CPU_PROTOCOL', 'EFI_SMM_CPU_PROTOCOL', 'P_EFI_SMM_CPU_PROTOCOL',
+    '_EFI_SMM_VARIABLE_PROTOCOL', 'EFI_SMM_VARIABLE_PROTOCOL', 'P_EFI_SMM_VARIABLE_PROTOCOL',
     'RETURN_STATUS', 'UINT64', 'UINTN',
     '_EFI_SMM_SW_DISPATCH2_PROTOCOL', 'byte', 'dword', 'longlong',
     'qword', 'struct_EFI_SMM_SW_REGISTER_CONTEXT',

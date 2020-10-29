@@ -50,6 +50,9 @@ guid = 18a3c6dc-5eea-48c8-a1c1-b53389f98999
 [EFI_SMM_CPU_PROTOCOL]
 guid = eb346b97-975f-4a9f-8b22-f8e92bb3d569
 
+[EFI_SMM_VARIABLE_PROTOCOL]
+guid = ed32d533-99e6-4209-9cc0-2d72cdd998a7
+
 [SMM]
 smbase = 0x12000
 smram_size = 0xff00

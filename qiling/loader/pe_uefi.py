@@ -250,6 +250,11 @@ class QlLoaderPE_UEFI(QlLoader):
         system_table_heap_ptr, smm_cpu_protocol = install_EFI_SMM_CPU_PROTOCOL(self.ql, system_table_heap_ptr)
         self.handle_dict[1][self.ql.os.profile.get("EFI_SMM_CPU_PROTOCOL", "guid")] = self.smm_cpu_protocol
 
+        self.smm_variable_protocol = system_table_heap_ptr
+        system_table_heap_ptr += ctypes.sizeof(P_EFI_SMM_VARIABLE_PROTOCOL)
+        system_table_heap_ptr, smm_variable_protocol = install_EFI_SMM_VARIABLE_PROTOCOL(self.ql, system_table_heap_ptr)
+        self.handle_dict[1][self.ql.os.profile.get("EFI_SMM_VARIABLE_PROTOCOL", "guid")] = self.smm_variable_protocol
+
         self.dxe_services_ptr = system_table_heap_ptr
         system_table_heap_ptr += ctypes.sizeof(EFI_DXE_SERVICES)
         system_table_heap_ptr, dxe_services = install_EFI_DXE_SERVICES(self.ql, system_table_heap_ptr)
@@ -277,6 +282,7 @@ class QlLoaderPE_UEFI(QlLoader):
         self.ql.mem.write(self.mm_access_protocol_ptr, convert_struct_to_bytes(mm_access_protocol))
         self.ql.mem.write(self.smm_sw_dispatch2_protocol_ptr, convert_struct_to_bytes(smm_sw_dispatch2_protocol))
         self.ql.mem.write(self.smm_cpu_protocol, convert_struct_to_bytes(smm_cpu_protocol))
+        self.ql.mem.write(self.smm_variable_protocol, convert_struct_to_bytes(smm_variable_protocol))
         self.ql.mem.write(self.dxe_services_ptr, convert_struct_to_bytes(dxe_services))
 
         for dependency in self.ql.argv:

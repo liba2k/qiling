@@ -1,3 +1,6 @@
+from qiling.os.uefi.runtime import hook_GetVariable, hook_GetNextVariableName, hook_SetVariable, \
+    hook_QueryVariableInfo
+
 from qiling.const import *
 from qiling.os.const import *
 from .const import *
@@ -180,6 +183,29 @@ def install_EFI_SMM_CPU_PROTOCOL(ql, start_ptr):
     ql.hook_address(hook_SMM_CPU_WriteSaveState, ptr)
     ptr += pointer_size
     return (ptr, efi_smm_cpu_protocol)
+
+def install_EFI_SMM_VARIABLE_PROTOCOL(ql, start_ptr):
+    efi_smm_variable_protocol = EFI_SMM_VARIABLE_PROTOCOL()
+    ptr = start_ptr
+    pointer_size = 8
+
+    efi_smm_variable_protocol.SmmGetVariable = ptr
+    ql.hook_address(hook_GetVariable, ptr)
+    ptr += pointer_size
+
+    efi_smm_variable_protocol.SmmGetNextVariableName = ptr
+    ql.hook_address(hook_GetNextVariableName, ptr)
+    ptr += pointer_size
+
+    efi_smm_variable_protocol.SmmSetVariable = ptr
+    ql.hook_address(hook_SetVariable, ptr)
+    ptr += pointer_size
+
+    efi_smm_variable_protocol.SmmQueryVariableInfo = ptr
+    ql.hook_address(hook_QueryVariableInfo, ptr)
+    ptr += pointer_size
+
+    return (ptr, efi_smm_variable_protocol)
 
 def call_smi_handlers(ql):
 
