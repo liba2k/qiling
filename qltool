@@ -286,17 +286,6 @@ if __name__ == '__main__':
         timeout = int(options.timeout)
     
     # ql run
-    import qiling
-    paramsForOperations = ql.mem.map_anywhere(64)
-    # Write GUID
-    ql.mem.write(paramsForOperations, b"\x00\x11\x22\x33\x44\x55\x66\x77\x88\aa\xbb\xcc\xdd\xee\xff")
-    paramsForOperationsAddr = paramsForOperations.to_bytes(8, 'little')
-    buff = ql.mem.map_anywhere(16)
-    ql.mem.write(buff, b"\x00\x01\x00\x00" + paramsForOperationsAddr)
-    # import ipdb; ipdb.set_trace()
-    ql.hook_address(address=0x1047d,
-                    callback=qiling.os.uefi.smm_sw_dispatch2_protocol.trigger_swsmi,
-                    user_data={'rsi': buff})
     with cov_utils.collect_coverage(ql, options.coverage_format, options.coverage_file):
         ql.run(timeout=timeout)
 

@@ -37,6 +37,7 @@ class QlLoaderPE_UEFI(QlLoader):
         self.handle_dict = {}
         self.notify_list = []
         self.next_image_base = 0x10000
+        self.should_trigger_swsmi = True
 
     @contextmanager
     def map_memory(self, addr, size):
