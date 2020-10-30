@@ -7,11 +7,14 @@
 import argparse, os, string, sys, ast, unicorn
 from binascii import unhexlify
 
+from qiling.os.uefi.type64 import EFI_GUID
+
 from qiling import *
 from qiling.const import QL_ARCH
 from qiling.__version__ import __version__ as ql_version
 from qiling.extensions.coverage import utils as cov_utils
 from qiling.extensions.report import generate_report
+import os
 
 def parse_args(parser, commands):
     # Divide argv by commands
@@ -286,13 +289,36 @@ if __name__ == '__main__':
         timeout = int(options.timeout)
     
     # ql run
+    from ctypes import *
+
+    pVarName = ql.mem.map_anywhere(16)
+    ql.mem.write(pVarName, b"Setup")
+
+    pDataSize = ql.mem.map_anywhere(16)
+    ql.mem.write(pDataSize, b"\x01\x00\x00\x00")
+
+    class ArgsForOperation(Structure):
+        _fields_ = [
+            ("Guid", EFI_GUID),
+            ("pVarName", c_uint32),
+            ("pAttributes", c_uint32),
+            ("pDataSize", c_uint32),
+            ("pDestBuffer", c_uint32)
+        ]
+
     import qiling
-    paramsForOperations = ql.mem.map_anywhere(64)
-    # Write GUID
-    ql.mem.write(paramsForOperations, b"\x00\x11\x22\x33\x44\x55\x66\x77\x88\aa\xbb\xcc\xdd\xee\xff")
-    paramsForOperationsAddr = paramsForOperations.to_bytes(8, 'little')
+    argsForOperation = ArgsForOperation()
+    argsForOperation.pVarName = pVarName
+    argsForOperation.pAttributes = 0
+    argsForOperation.pDataSize = pDataSize
+    argsForOperation.pDestBuffer = pVarName
+
+    # Write params structure to memory
+    paramsForOperationsAddr = ql.mem.map_anywhere(sizeof(argsForOperation))
+    ql.mem.write(paramsForOperationsAddr, bytes(argsForOperation))
+
     buff = ql.mem.map_anywhere(16)
-    ql.mem.write(buff, b"\x00\x01\x00\x00" + paramsForOperationsAddr)
+    ql.mem.write(buff, b"\x00\x01\x00\x00" + paramsForOperationsAddr.to_bytes(8, 'little'))
     # import ipdb; ipdb.set_trace()
     ql.hook_address(address=0x1047d,
                     callback=qiling.os.uefi.smm_sw_dispatch2_protocol.trigger_swsmi,
