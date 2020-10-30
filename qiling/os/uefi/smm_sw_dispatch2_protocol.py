@@ -150,7 +150,6 @@ def hook_SMM_CPU_ReadSaveState(ql, address, params):
         EFI_SMM_SAVE_STATE_REGISTER_RSI: 0x7f8c,
     }
 
-    import ipdb; ipdb.set_trace()
     # Find start of smram
     # save_state = smram + 0x8000
     # add the offset the current offset
