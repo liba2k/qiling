@@ -289,40 +289,6 @@ if __name__ == '__main__':
         timeout = int(options.timeout)
     
     # ql run
-    from ctypes import *
-
-    pVarName = ql.mem.map_anywhere(16)
-    ql.mem.write(pVarName, b"Setup")
-
-    pDataSize = ql.mem.map_anywhere(16)
-    ql.mem.write(pDataSize, b"\x01\x00\x00\x00")
-
-    class ArgsForOperation(Structure):
-        _fields_ = [
-            ("Guid", EFI_GUID),
-            ("pVarName", c_uint32),
-            ("pAttributes", c_uint32),
-            ("pDataSize", c_uint32),
-            ("pDestBuffer", c_uint32)
-        ]
-
-    import qiling
-    argsForOperation = ArgsForOperation()
-    argsForOperation.pVarName = pVarName
-    argsForOperation.pAttributes = 0
-    argsForOperation.pDataSize = pDataSize
-    argsForOperation.pDestBuffer = pVarName
-
-    # Write params structure to memory
-    paramsForOperationsAddr = ql.mem.map_anywhere(sizeof(argsForOperation))
-    ql.mem.write(paramsForOperationsAddr, bytes(argsForOperation))
-
-    buff = ql.mem.map_anywhere(16)
-    ql.mem.write(buff, b"\x00\x01\x00\x00" + paramsForOperationsAddr.to_bytes(8, 'little'))
-    # import ipdb; ipdb.set_trace()
-    ql.hook_address(address=0x1047d,
-                    callback=qiling.os.uefi.smm_sw_dispatch2_protocol.trigger_swsmi,
-                    user_data={'rsi': buff})
     with cov_utils.collect_coverage(ql, options.coverage_format, options.coverage_file):
         ql.run(timeout=timeout)
 
