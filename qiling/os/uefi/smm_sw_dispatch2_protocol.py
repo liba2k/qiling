@@ -10,8 +10,6 @@ from .fncc import *
 
 pointer_size = ctypes.sizeof(ctypes.c_void_p)
 
-smram = 0
-
 def free_pointers(ql, address, params):
     print("free pointers called")
     ql.os.heap.free(address)
@@ -154,7 +152,7 @@ def hook_SMM_CPU_ReadSaveState(ql, address, params):
     # save_state = smram + 0x8000
     # add the offset the current offset
     # read the register
-    addr = smram + 0x8000 + offsets[params["Register"]]
+    addr = ql.os.smbase + 0x8000 + offsets[params["Register"]]
     reg = ql.mem.read(addr, params["Width"])
     ql.mem.write(params["Buffer"], bytes(reg))
 
@@ -237,55 +235,50 @@ def call_smi_handlers(ql):
 
 def trigger_swsmi(ql, user_data=None):
 
+    ql.os.InSmm = 1
+
     ql.reg.rsi = user_data['rsi']
 
-    global smram
-    # import ipdb; ipdb.set_trace()
-    # Allocate and initialize SMRAM
-    # smbase = int(ql.os.profile.get("SMM", "smbase"), 16)
-    smram_size = int(ql.os.profile.get("SMM", "smram_size"), 16)
-    # smram = ql.mem.map(smbase, smram_size)
-    smram = ql.mem.map_anywhere(smram_size)
-    smbase = smram
+    # smram = ql.mem.map_anywhere(smram_size)
 
     # import ipdb; ipdb.set_trace()
     # ql.os.emu_error()
 
     # Copy all arguments to the save state
-    ql.mem.write(smbase + 0x8000 + 0x7ff8, ql.reg.cr0.to_bytes(8, 'little'))
-    ql.mem.write(smbase + 0x8000 + 0x7ff0, ql.reg.cr3.to_bytes(8, 'little'))
-    ql.mem.write(smbase + 0x8000 + 0x7fe8, ql.reg.ef.to_bytes(8, 'little'))
-    ql.mem.write(smbase + 0x8000 + 0x7fe0, (0).to_bytes(8, 'little')) # IA32_EFER
-    ql.mem.write(smbase + 0x8000 + 0x7fd8, ql.reg.rip.to_bytes(8, 'little'))
-    ql.mem.write(smbase + 0x8000 + 0x7fd0, (0).to_bytes(8, 'little')) # DR6
-    ql.mem.write(smbase + 0x8000 + 0x7fc8, (0).to_bytes(8, 'little')) # DR7
-    ql.mem.write(smbase + 0x8000 + 0x7fc4, (0).to_bytes(4, 'little'))  # TR SEL
-    ql.mem.write(smbase + 0x8000 + 0x7fc0, (0).to_bytes(4, 'little'))  # LDTR SEL
-    ql.mem.write(smbase + 0x8000 + 0x7fbc, (0).to_bytes(4, 'little'))  # GS SEL
-    ql.mem.write(smbase + 0x8000 + 0x7fbc, ql.reg.gs.to_bytes(4, 'little'))
-    ql.mem.write(smbase + 0x8000 + 0x7fb8, ql.reg.fs.to_bytes(4, 'little'))
-    ql.mem.write(smbase + 0x8000 + 0x7fb4, ql.reg.ds.to_bytes(4, 'little'))
-    ql.mem.write(smbase + 0x8000 + 0x7fb0, ql.reg.ss.to_bytes(4, 'little'))
-    ql.mem.write(smbase + 0x8000 + 0x7fac, ql.reg.cs.to_bytes(4, 'little'))
-    ql.mem.write(smbase + 0x8000 + 0x7fa8, ql.reg.es.to_bytes(4, 'little'))
-    ql.mem.write(smbase + 0x8000 + 0x7fa4, (0).to_bytes(4, 'little')) # IO MISC
-    ql.mem.write(smbase + 0x8000 + 0x7f9c, (0).to_bytes(8, 'little'))  # IO MEM ADDR
-    ql.mem.write(smbase + 0x8000 + 0x7f94, ql.reg.rdi.to_bytes(8, 'little'))
-    ql.mem.write(smbase + 0x8000 + 0x7f8c, ql.reg.rsi.to_bytes(8, 'little'))
-    ql.mem.write(smbase + 0x8000 + 0x7f84, ql.reg.rbp.to_bytes(8, 'little'))
-    ql.mem.write(smbase + 0x8000 + 0x7f7c, ql.reg.rsp.to_bytes(8, 'little'))
-    ql.mem.write(smbase + 0x8000 + 0x7f74, ql.reg.rbx.to_bytes(8, 'little'))
-    ql.mem.write(smbase + 0x8000 + 0x7f6c, ql.reg.rdx.to_bytes(8, 'little'))
-    ql.mem.write(smbase + 0x8000 + 0x7f64, ql.reg.rcx.to_bytes(8, 'little'))
-    ql.mem.write(smbase + 0x8000 + 0x7f5c, ql.reg.rax.to_bytes(8, 'little'))
-    ql.mem.write(smbase + 0x8000 + 0x7f54, ql.reg.r8.to_bytes(8, 'little'))
-    ql.mem.write(smbase + 0x8000 + 0x7f4c, ql.reg.r9.to_bytes(8, 'little'))
-    ql.mem.write(smbase + 0x8000 + 0x7f44, ql.reg.r10.to_bytes(8, 'little'))
-    ql.mem.write(smbase + 0x8000 + 0x7f3c, ql.reg.r11.to_bytes(8, 'little'))
-    ql.mem.write(smbase + 0x8000 + 0x7f34, ql.reg.r12.to_bytes(8, 'little'))
-    ql.mem.write(smbase + 0x8000 + 0x7f2c, ql.reg.r13.to_bytes(8, 'little'))
-    ql.mem.write(smbase + 0x8000 + 0x7f24, ql.reg.r14.to_bytes(8, 'little'))
-    ql.mem.write(smbase + 0x8000 + 0x7f1c, ql.reg.r15.to_bytes(8, 'little'))
+    ql.mem.write(ql.os.smbase + 0x8000 + 0x7ff8, ql.reg.cr0.to_bytes(8, 'little'))
+    ql.mem.write(ql.os.smbase + 0x8000 + 0x7ff0, ql.reg.cr3.to_bytes(8, 'little'))
+    ql.mem.write(ql.os.smbase + 0x8000 + 0x7fe8, ql.reg.ef.to_bytes(8, 'little'))
+    ql.mem.write(ql.os.smbase + 0x8000 + 0x7fe0, (0).to_bytes(8, 'little')) # IA32_EFER
+    ql.mem.write(ql.os.smbase + 0x8000 + 0x7fd8, ql.reg.rip.to_bytes(8, 'little'))
+    ql.mem.write(ql.os.smbase + 0x8000 + 0x7fd0, (0).to_bytes(8, 'little')) # DR6
+    ql.mem.write(ql.os.smbase + 0x8000 + 0x7fc8, (0).to_bytes(8, 'little')) # DR7
+    ql.mem.write(ql.os.smbase + 0x8000 + 0x7fc4, (0).to_bytes(4, 'little'))  # TR SEL
+    ql.mem.write(ql.os.smbase + 0x8000 + 0x7fc0, (0).to_bytes(4, 'little'))  # LDTR SEL
+    ql.mem.write(ql.os.smbase + 0x8000 + 0x7fbc, (0).to_bytes(4, 'little'))  # GS SEL
+    ql.mem.write(ql.os.smbase + 0x8000 + 0x7fbc, ql.reg.gs.to_bytes(4, 'little'))
+    ql.mem.write(ql.os.smbase + 0x8000 + 0x7fb8, ql.reg.fs.to_bytes(4, 'little'))
+    ql.mem.write(ql.os.smbase + 0x8000 + 0x7fb4, ql.reg.ds.to_bytes(4, 'little'))
+    ql.mem.write(ql.os.smbase + 0x8000 + 0x7fb0, ql.reg.ss.to_bytes(4, 'little'))
+    ql.mem.write(ql.os.smbase + 0x8000 + 0x7fac, ql.reg.cs.to_bytes(4, 'little'))
+    ql.mem.write(ql.os.smbase + 0x8000 + 0x7fa8, ql.reg.es.to_bytes(4, 'little'))
+    ql.mem.write(ql.os.smbase + 0x8000 + 0x7fa4, (0).to_bytes(4, 'little')) # IO MISC
+    ql.mem.write(ql.os.smbase + 0x8000 + 0x7f9c, (0).to_bytes(8, 'little'))  # IO MEM ADDR
+    ql.mem.write(ql.os.smbase + 0x8000 + 0x7f94, ql.reg.rdi.to_bytes(8, 'little'))
+    ql.mem.write(ql.os.smbase + 0x8000 + 0x7f8c, ql.reg.rsi.to_bytes(8, 'little'))
+    ql.mem.write(ql.os.smbase + 0x8000 + 0x7f84, ql.reg.rbp.to_bytes(8, 'little'))
+    ql.mem.write(ql.os.smbase + 0x8000 + 0x7f7c, ql.reg.rsp.to_bytes(8, 'little'))
+    ql.mem.write(ql.os.smbase + 0x8000 + 0x7f74, ql.reg.rbx.to_bytes(8, 'little'))
+    ql.mem.write(ql.os.smbase + 0x8000 + 0x7f6c, ql.reg.rdx.to_bytes(8, 'little'))
+    ql.mem.write(ql.os.smbase + 0x8000 + 0x7f64, ql.reg.rcx.to_bytes(8, 'little'))
+    ql.mem.write(ql.os.smbase + 0x8000 + 0x7f5c, ql.reg.rax.to_bytes(8, 'little'))
+    ql.mem.write(ql.os.smbase + 0x8000 + 0x7f54, ql.reg.r8.to_bytes(8, 'little'))
+    ql.mem.write(ql.os.smbase + 0x8000 + 0x7f4c, ql.reg.r9.to_bytes(8, 'little'))
+    ql.mem.write(ql.os.smbase + 0x8000 + 0x7f44, ql.reg.r10.to_bytes(8, 'little'))
+    ql.mem.write(ql.os.smbase + 0x8000 + 0x7f3c, ql.reg.r11.to_bytes(8, 'little'))
+    ql.mem.write(ql.os.smbase + 0x8000 + 0x7f34, ql.reg.r12.to_bytes(8, 'little'))
+    ql.mem.write(ql.os.smbase + 0x8000 + 0x7f2c, ql.reg.r13.to_bytes(8, 'little'))
+    ql.mem.write(ql.os.smbase + 0x8000 + 0x7f24, ql.reg.r14.to_bytes(8, 'little'))
+    ql.mem.write(ql.os.smbase + 0x8000 + 0x7f1c, ql.reg.r15.to_bytes(8, 'little'))
     # Rest will follow here
 
     # Set InSmm to TRUE

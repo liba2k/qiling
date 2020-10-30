@@ -4,9 +4,9 @@
 # Built on top of Unicorn emulator (www.unicorn-engine.org) 
 
 from .utils import *
+from qiling.os.uefi.type64 import EFI_GUID
 from qiling.os.uefi.smm_sw_dispatch2_protocol import trigger_swsmi
 from ctypes import *
-import qiling
 
 class ArgsForOperation(Structure):
     _fields_ = [
@@ -18,6 +18,7 @@ class ArgsForOperation(Structure):
     ]
 
 def hook_EndOfExecution(ql):
+    ql.os.InSmm = 0 # We always leave SMM when switching between modules.
     ql.loader.restore_runtime_services()
     if check_and_notify_protocols(ql):
         return

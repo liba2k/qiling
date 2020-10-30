@@ -11,7 +11,8 @@ from .fncc import *
     "InSmram": POINTER, #POINTER_T(ctypes.c_ubyte)
 })
 def hook_InSmm(ql, address, params):
-    write_int64(ql, params["InSmram"], 1)
+    ql.os.InSmm = 1 # We assume that a modules that checks if they are in SMM should be in SMM.
+    write_int64(ql, params["InSmram"], ql.os.InSmm)
     return EFI_SUCCESS
 
 @dxeapi(params={

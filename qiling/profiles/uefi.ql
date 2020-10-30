@@ -55,7 +55,7 @@ guid = ed32d533-99e6-4209-9cc0-2d72cdd998a7
 
 [SMM]
 smbase = 0x12000
-smram_size = 0xff00
+smram_size = 0x10000
 
 [LOG]
 # log directory output
