@@ -161,7 +161,14 @@ def hook_CheckEvent(ql, address, params):
 	"Interface"		: POINTER,		# PTR(VOID)
 })
 def hook_InstallProtocolInterface(ql, address, params):
-	return common.InstallProtocolInterface(ql.loader.dxe_context, params)
+	ret = common.InstallProtocolInterface(ql.loader.dxe_context, params)
+	for (event_id, event_dic) in ql.loader.events.items():
+		if event_dic['Guid'] == params['Protocol']:
+			# The event was previously registered by 'RegisterProtocolNotify'.
+			signal_event(ql, event_id)
+			check_and_notify_protocols(ql, True)
+	return ret
+
 
 @dxeapi(params = {
 	"Handle"		: POINTER,	# EFI_HANDLE
@@ -212,7 +219,7 @@ def hook_RegisterProtocolNotify(ql, address, params):
 
 	if event in ql.loader.events:
 		ql.loader.events[event]['Guid'] = proto
-		check_and_notify_protocols(ql)
+		check_and_notify_protocols(ql, True)
 
 		return EFI_SUCCESS
 

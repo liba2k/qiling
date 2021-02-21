@@ -78,6 +78,8 @@ class SmmContext(UefiContext):
 
 		self.swsmi_handlers = []
 
+		self.ProtocolNotify = {}
+
 	def install_configuration_table(self, guid, table):
 		super().install_configuration_table(guid, table)
 		# Update number of configuration table entries in the SMST.

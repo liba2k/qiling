@@ -37,13 +37,6 @@ def InstallProtocolInterface(context, params):
 
 	dic[params["Protocol"]] = params["Interface"]
 	context.protocols[handle] = dic
-
-	for (event_id, event_dic) in context.ql.loader.events.items():
-		if event_dic['Guid'] == params['Protocol']:
-			# The event was previously registered by 'RegisterProtocolNotify'.
-			signal_event(context.ql, event_id)	
-
-	check_and_notify_protocols(context.ql, True)
 	write_int64(context.ql, params["Handle"], handle)
 
 	return EFI_SUCCESS

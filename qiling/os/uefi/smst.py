@@ -157,7 +157,25 @@ def hook_SmmStartupThisAp(ql, address, params):
 	"Interface"		: POINTER,		# PTR(VOID)
 })
 def hook_SmmInstallProtocolInterface(ql, address, params):
-	return common.InstallProtocolInterface(ql.loader.smm_context, params)
+	ret = common.InstallProtocolInterface(ql.loader.smm_context, params)
+	with ql.loader.smm_context.ProtocolNotify as pn:
+		if params["Protocol"] in pn:
+			next_hook = ql.loader.smm_context.heap.alloc(1)
+			def exec_next(ql):
+				if len(pn[params["Protocol"]]) > 0:
+					notify_func =  pn[params["Protocol"]].pop()
+					ql.loader.call_function(notify_func, [params['Protocol'], params['Interface'], params['Handle']], next_hook)
+				else:
+					ql.loader.smm_context.heap.free(next_hook)
+					ql.hook_address(lambda q: None, next_hook)
+					ql.reg.rax = ret
+					ql.reg.arch_pc = ql.stack_read(0)
+			ql.hook_address(exec_next, next_hook, )
+			# To avoid having two versions of the code the first notify function will also be called from the exec_next hook.
+			ql.stack_push(next_hook)
+		else:
+			return ret
+			
 
 @dxeapi(params = {
 	"Handle"	: POINTER,	# EFI_HANDLE
@@ -181,14 +199,14 @@ def hook_SmmHandleProtocol(ql, address, params):
 	"Registration"	: POINTER	# PTR(PTR(VOID))
 })
 def hook_SmmRegisterProtocolNotify(ql, address, params):
-	#event = params['Event']
-	#proto = params["Protocol"]
-	#
-	#if event in ql.loader.events:
-	#	ql.loader.events[event]['Guid'] = proto
-	#	check_and_notify_protocols(ql)
-	#
-	#	return EFI_SUCCESS
+	with ql.loader.smm_context.ProtocolNotify as pn:
+		with params["Protocol"] as proto:
+			if proto not in pn:
+				pn[proto] = set()
+			pn[proto].add(params["Function"])
+			if params["Registration"]:
+				ptr_write64(ql, params["Registration"], len(pn[proto]))
+	return EFI_SUCCESS
 
 	return EFI_INVALID_PARAMETER
 
